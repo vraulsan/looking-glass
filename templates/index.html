@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <title>Looking Glass</title>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+  <link href="static/css/material-kit.min.css" rel="stylesheet"/>
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-rose">
+    <div class="container">
+      <div class="navbar-translate">
+        <a class="navbar-brand" style="font-size:35px" href="http://fireprotocol.com">fire protocol</a>
+      </div>
+      <div class="collapse navbar-collapse">
+      </div>
+    </div>
+  </nav>
+  <br><br><br>
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-xs-12 col-sm-12">
+        <div class="card card-nav-tabs">
+          <div class="card-header card-header-rose">
+          <h3 class="card-title" style="text-align:center;padding-bottom:5px;font-family:'Roboto';font-weight:100">Looking Glass</h3>
+          </div>
+          <div class="card-body">
+            <form onsubmit="return false" name="queryform" id="lgForm">
+
+            <div class="col-12 col-sm-12 col-xs-12" style="text-align: center;padding: 15px 0px 20px 0px">
+              <div class="form-check form-check-radio form-check-inline" style="padding-right:40px">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="cmd" value="bgp"> bgp
+                  <span class="circle"><span class="check"></span></span>
+                </label>
+              </div>
+              <div class="form-check form-check-radio form-check-inline" style="padding-right:40px">
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="cmd" value="ping"> ping
+                  <span class="circle"><span class="check"></span></span>
+                </label>
+              </div>
+              <div class="form-check form-check-radio form-check-inline" >
+                <label class="form-check-label">
+                  <input class="form-check-input" type="radio" name="cmd" value="traceroute"> trace
+                  <span class="circle"><span class="check"></span></span>
+                </label>
+              </div>
+            </div>
+
+              <div class="form-group" style="padding-bottom: 20px">
+                <label for="ipprefix">IP / Prefix</label>
+                <input id="ipprefix" class="form-control" id="ipprefix" placeholder="e.g. 8.8.8.8" style="color:#e91f62;font-size:23px">
+              </div>
+
+              <!-- This is the network/ASN dropdown, edit to fit your network-->
+              <div class="form-group" style="padding-bottom: 20px">
+                <label for="network">Network</label>
+                <select name="network" id="network" class="form-control selectpicker" data-style="btn btn-link" style="color:#e91f62;font-size:22px">
+                  <option disabled selected></option>
+                  <option value="" disabled selected> </option>
+                  <option value="33363">Earth - AS65532</option>
+                  <option value="10796">Mars - AS65533</option>
+                  <option value="20115">Saturn - AS65534</option>
+                </select>
+              </div><!-- End of network/ASN dropdown -->
+
+              <!-- This is the routers dropdown, it will get populated by the GET /routers call-->
+              <div class="form-group" style="padding-bottom: 20px">
+                <label for="router">Router</label>
+                <select id="router" class="form-control selectpicker" data-style="btn btn-link" style="color:#e91f62;font-size:22px">
+                  <option value="" disabled selected></option>
+                </select>
+              </div> <!-- End of routers dropdown -->
+
+              <div style="padding-bottom:15px" class="text-center">
+              <input id="goButton" type="submit" value="Go !" class="btn btn-rose"></input>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12 col-sm-12">
+        <div class="card card-nav-tabs">
+          <div class="card-header card-header-rose">
+            <h3 class="card-title" style="text-align:center;padding-bottom:5px;font-family:'Roboto';font-weight:100">Results</h3>
+          </div>
+            <div class="card-body" style="height:480px;overflow:scroll">
+              <div class="container">
+              <pre id="queryInfo" style="font-size:13px;margin-bottom:0px">
+              </pre>
+                  <div class="fa-3x" style="text-align:center">
+                    <i id="loading" class="fa fa-spinner fa-spin" style="color:#e91f62;display:none;padding-top:10px"></i>
+                  </div>
+              <pre id="results" style="font-size:12px;overflow:visible">
+              </pre>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</body>
+
+<footer class="footer footer-rose" >
+  <div class="container">
+    <nav class="float-left">
+      <ul>
+        <li>
+          <a href="https://www.creative-tim.com/">
+              Creative Tim
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="copyright float-right">
+        &copy;
+        <script>
+            document.write(new Date().getFullYear())
+        </script>, made with <i style="color:#e33771" class="material-icons">favorite</i> by
+        <a href="http://fireprotocol.com" target="blank">Victor</a>
+    </div>
+  </div>
+</footer>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script>
+
+///////////////// Get the list of routers for the selected Network //////////////////////////////////////////////////
+
+$('#network').on('change', () => {
+  var asn = $("select[name=network").val()
+  $.ajax({
+    url: `/routers/${asn}`,
+    type: 'get',
+    success: function (data) {
+      updateRouters(JSON.parse(data));
+    },
+    error: function (err) {
+      console.log(err)
+    }
+  })
+})
+
+function updateRouters (routers) {
+  console.log(routers)
+  $('#router').empty();
+  $('#router').prop('disabled', false);
+  $('#router').append($('<option>', {
+    value: "",
+    text: "",
+    disabled: true,
+    selected: true
+  }))
+  routers.forEach(function (r) {
+    $('#router').append($('<option>', {
+      value: r.name,
+      text: r.location,
+      type: r.type
+    }))
+  })
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+///////////////// Submit Form  //////////////////////////////////////////////////////////////////////////////
+
+$('#lgForm').on('submit', function () {submitForm()})
+
+var submitForm = function() {
+
+  $('#loading').show();
+  var cmd = $('input[name=cmd]:checked', '#lgForm').val();
+  var router = $('#router option:selected').val();
+  var ipprefix = $('#ipprefix').val();
+  var routerType = $('#router option:selected').attr('type')
+
+  var command = getCommandSyntax(cmd, routerType, ipprefix);
+
+  $('#results').text("")
+  $('#queryInfo').text("")
+
+  $('#queryInfo').html(`
+<b>Network: </b> ${$("#network option:selected").text()}
+<b>Router: </b> ${router}
+<b>Command: </b> ${command}`)
+
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', '/lg', true);
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8')
+  xhr.send(JSON.stringify({router: router, cmd: cmd, ipprefix: ipprefix}));
+
+  xhr_timer = window.setInterval(function() {
+    if (xhr.readyState == XMLHttpRequest.DONE) {
+      $('#loading').hide();
+      window.clearTimeout(xhr_timer);
+    }
+    document.getElementById('results').innerHTML = xhr.responseText;
+  }, 500);
+
+  xhr.addEventListener("error", function(e) {
+    console.log("error: " + e);
+  });
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+function getCommandSyntax(cmd, routerType, ipprefix) {
+
+  switch (cmd) {
+    case 'bgp':
+      switch (routerType) {
+        case 'JunOS':
+          return `show route protocol bgp ${ipprefix} table inet.0 detail`
+        case 'IOS-XR':
+          return `show bgp ipv4 unicast ${ipprefix}`
+      }
+    case 'ping':
+      return `ping ${ipprefix} count 5`
+    case 'traceroute':
+      switch (routerType) {
+        case 'JunOS':
+          return `traceroute ${ipprefix} wait 2`
+        case 'IOS-XR':
+          return `traceroute ${ipprefix} timeout 2 probe 2`
+      }
+  }
+}
+
+</script>
+</html>
