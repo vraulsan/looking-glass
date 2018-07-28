@@ -34,7 +34,7 @@ routers_list = [
     asn='65532',
     location='Earth',
     jumpserver=False
-  )
+  ),
   dict(address=('earth01-r2', 22),
     usern=os.getenv('USERN'),
     passw=os.getenv('PASSW'),
