@@ -30,9 +30,17 @@ routers_list = [
   dict(address=('earth01-r1', 22),
     usern=os.getenv('USERN'),
     passw=os.getenv('PASSW'),
-    type='JunOS',
+    type='IOS-XR',
     asn='65532',
-    location='Mars',
+    location='Earth',
+    jumpserver=False
+  )
+  dict(address=('earth01-r2', 22),
+    usern=os.getenv('USERN'),
+    passw=os.getenv('PASSW'),
+    type='IOS-XR',
+    asn='65532',
+    location='Earth',
     jumpserver=False
   )
 ]
