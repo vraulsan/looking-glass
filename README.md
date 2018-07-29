@@ -1,7 +1,9 @@
 ## BGP Looking Glass
 
 This is a tiny and minimalist Python3 looking glass implementation.
+
 Server connects using Paramiko and serves via Flask.
+
 Client is HTML and Javascript is used to make the calls and update the DOM.
 
 `git clone https://github.com/vraulsan/looking-glass.git && cd looking-glass`
